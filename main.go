@@ -62,11 +62,7 @@ func main() {
 
 	AutoUpdater()
 
-	addr := net.UDPAddr{
-		IP: net.ParseIP("127.0.0.1"),
-		Port: 53,
-	}
-	conn, err := net.ListenUDP("udp", &addr); if err != nil{
+	conn, err := net.ListenPacket("udp", ":53"); if err != nil{
 		fmt.Println("failed to connect")
 		os.Exit(1)
 	}
@@ -77,7 +73,7 @@ func main() {
 	buffer := make([]byte, 1024)
 
 	for {
-		n, clientAddr, err := conn.ReadFromUDP(buffer); if err != nil{
+		n, clientAddr, err := conn.ReadFrom(buffer); if err != nil{
 			fmt.Println("failed to get data")
 			continue
 		}
@@ -107,13 +103,25 @@ func main() {
 						reply.Answer = append(reply.Answer, rr)
 					}
 				}
+				if qtype == dns.TypeAAAA{
+					answer := fmt.Sprintf("%s 60 IN AAAA ::", domain)
+					rr, err := dns.NewRR(answer); if err == nil{
+						reply.Answer = append(reply.Answer, rr)
+					}
+				}
 				fmt.Println("[Blocked] ", domain)
 			} else {
-				c := new(dns.Client)
-				upstream, _, err := c.Exchange(msg, "1.1.1.1:53"); if err == nil && upstream != nil{
-					reply.Answer = upstream.Answer
-				} else{
-					fmt.Println("Failed to get upstream response")
+				resBytes, err := Upstream(buffer[:n]); if err == nil && resBytes != nil{
+					var upstreamMsg dns.Msg
+					err := upstreamMsg.Unpack(resBytes); if err == nil{
+						reply.Answer = upstreamMsg.Answer
+						reply.Extra = upstreamMsg.Extra
+						reply.Ns = upstreamMsg.Ns
+					} else {
+						fmt.Println("failed to unpack response: ", err)
+					}
+				} else {
+					fmt.Println("Failed to get upstream response: ", err)
 				}
 			}
 
@@ -122,7 +130,7 @@ func main() {
 				continue
 			}
 
-			_, err = conn.WriteToUDP(replyBytes, clientAddr); if err != nil{
+			_, err = conn.WriteTo(replyBytes, clientAddr); if err != nil{
 				fmt.Println("failed to send response")
 			}
 		}
