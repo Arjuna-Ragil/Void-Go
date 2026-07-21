@@ -1,6 +1,6 @@
 # stage 1
 
-FROM golang:1.21-alpine AS builder
+FROM golang:alpine AS builder
 
 WORKDIR /app
 
@@ -14,6 +14,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o Void-Go .
 # Stage 2
 
 FROM alpine:latest
+
+LABEL org.opencontainers.image.source="https://github.com/Arjuna-Ragil/Void-Go"
 
 RUN apk --no-cache add ca-certificates
 
