@@ -26,7 +26,7 @@ Void-Go is designed for privacy enthusiasts and developers who need a reliable, 
 
 While Pi-hole is an incredible and feature-rich tool, it comes with a web UI and multiple dependencies (PHP, lighttpd, etc.) which might be overkill for minimalist setups. **Void-Go** is built for people who just want a silent, ultra-lightweight filter without the frontend overhead.
 
-| Feature | 🛡️ Void-Go | 🕳️ Pi-hole |
+| Feature | Void-Go | Pi-hole |
 | :--- | :--- | :--- |
 | **Architecture** | Headless / CLI-first | Web UI / Dashboard |
 | **Docker Image Size** | **~9 MB** | ~120 MB |
