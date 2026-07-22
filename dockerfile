@@ -26,4 +26,4 @@ COPY --from=builder /app/Void-Go .
 EXPOSE 53/udp
 EXPOSE 53/tcp
 
-CMD ["./dns-blocker"]
+CMD ["./Void-Go"]

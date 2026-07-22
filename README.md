@@ -45,20 +45,36 @@ docker run -d \
   --name void-go \
   -p 53:53/tcp \
   -p 53:53/udp \
+  --dns 1.1.1.1 \
+  --dns 8.8.8.8 \
   --restart unless-stopped \
-  ghcr.io/arjuna-ragil/void-go:v1
+  ghcr.io/arjuna-ragil/void-go:latest
 ```
 
 ### Docker Compose
 ```
 services:
   void-go:
-    image: ghcr.io/arjuna-ragil/void-go:v1
+    image: ghcr.io/arjuna-ragil/void-go:latest
     container_name: void-go
     ports:
       - "53:53/tcp"
       - "53:53/udp"
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     restart: unless-stopped
+```
+
+### Additional Notes for setup
+- in linux, dont forget to turn off DNSStubListener (DNSStubListener = no)
+- if you dont want to make changes to the systemd resolver config, you can specify the port
+```
+ports:
+      - "192.168.x.x:53:53/tcp"
+      - "192.168.x.x:53:53/udp"
+      - "100.x.x.x:53:53/tcp" # if using tailscale, use the tailscale IP of the device that void-go is on.
+      - "100.x.x.x:53:53/tcp" 
 ```
 
 ## Thanks You For Using Void-Go :)
